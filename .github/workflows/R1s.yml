@@ -14,6 +14,8 @@ on:
   push:
     branches: 
       - master
+    paths:
+      - '.github/workflows/R1s.yml'
 
   # release:
   #   types: [published]
@@ -94,13 +96,14 @@ jobs:
           sed -i '/Load Average/i\<tr><td width="33%"><%:CPU Temperature%></td><td><%=luci.sys.exec("cut -c1-2 /sys/class/thermal/thermal_zone0/temp")%></td></tr>' feeds/luci/modules/luci-mod-admin-full/luasrc/view/admin_status/index.htm
           sed -i 's/pcdata(boardinfo.system or "?")/"ARMv8"/' feeds/luci/modules/luci-mod-admin-full/luasrc/view/admin_status/index.htm
           
-      - name: Build OpenWrt
+      - name: Build FriendlyWrt
         run: |
-          cd friendlywrt-h5
-          cp configs/config_h5 friendlywrt/.config
-          cd friendlywrt
+          cd friendlywrt-h5/friendlywrt
+          rm -f ./.config*
+          wget https://raw.githubusercontent.com/qzhome2102/NanoPi-R1S-Build-By-Actions/master/r1s-h5-config
+          cp r1s-h5-config .config
           ./scripts/feeds update -a && ./scripts/feeds install -a
-          make defconfig 
+          make defconfig
           
       - name: SSH connection to Actions
         uses: P3TERX/debugger-action@master
